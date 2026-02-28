@@ -10,10 +10,10 @@ router.get("/", (_req, res) => {
   res.json({ message: "API is running" });
 });
 
-// User routes (sync & profile) — all protected
-router.use("/users", userRouter);
-
 // Protected: requires a valid Clerk session token
 router.post("/idea", requireAuth, postIdeaController);
+
+// User routes (sync & profile) — all protected
+router.use("/users", userRouter);
 
 export default router;
