@@ -1,15 +1,19 @@
 import { Router } from "express";
 import postIdeaController from "../controllers/postIdea.controller";
+import requireAuth from "../middlewares/requireAuth";
+import userRouter from "./user.routes";
 
 const router = Router();
 
-// Register sub-routes here
-// e.g. router.use("/users", userRouter);
-
+// Health / root
 router.get("/", (_req, res) => {
   res.json({ message: "API is running" });
 });
 
-router.post("/idea", postIdeaController);
+// User routes (sync & profile) — all protected
+router.use("/users", userRouter);
+
+// Protected: requires a valid Clerk session token
+router.post("/idea", requireAuth, postIdeaController);
 
 export default router;

@@ -3,6 +3,9 @@ import cors from "cors";
 import router from "./routes";
 import CustomError from "./utils/customError";
 import { errorHandler } from "./middlewares/errorHandler";
+import { clerkMiddleware } from "@clerk/express";
+import mongoose from "mongoose";
+import { env } from "./config/env";
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (err: Error) => {
@@ -18,6 +21,7 @@ app.use(cors({ origin: "*" }));
 app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
 
+app.use(clerkMiddleware());
 app.use("/api", router);
 
 // Handle 404 for undefined routes
@@ -28,18 +32,17 @@ app.all("/{*splat}", (req: Request, res: Response, next: NextFunction) => {
   );
   next(err);
 });
-
 // Global Error Handler
 app.use(errorHandler);
 
 // Database Connection
-// mongoose
-//   .connect(DB_URI)
-//   .then(() => console.log("Database Connected!"))
-//   .catch((err: Error) => {
-//     console.error("Database Connection Error:", err.message);
-//     process.exit(1);
-//   });
+mongoose
+  .connect(env.DB_URI)
+  .then(() => console.log("Database Connected!"))
+  .catch((err: Error) => {
+    console.error("Database Connection Error:", err.message);
+    process.exit(1);
+  });
 
 // Start Server
 const PORT = process.env.PORT || 5000;
